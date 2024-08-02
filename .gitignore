@@ -1,0 +1,16 @@
+# nix build artifacts
+result*
+repl-result-out*
+
+# dev shell
+.direnv/
+.env*
+!.env.template
+!.envrc.template
+
+# terranix
+config.tf.json
+plan.tf
+*.tfstate*
+.terraform/
+.terraform.*

@@ -1,0 +1,3 @@
+[submodule "flake-secrets"]
+	path = secrets
+	url = git@github.com:vdbe/flake-secrets.git
