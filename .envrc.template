@@ -2,6 +2,5 @@ dotenv_if_exists .env
 
 if has nix; then
   nix_direnv_manual_reload
-  watch_file dev
   use flake
 fi

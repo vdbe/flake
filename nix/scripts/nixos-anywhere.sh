@@ -59,7 +59,7 @@ persistence="$(nix eval "${flake}nixosConfigurations.${configuration_name}.confi
 
 mkdir -p "$extra_files/etc"
 if [[ "$persistence" == "true" ]]; then
-  required_system_state__persistentStorage_path="$(nix eval --raw "${flake}nixosConfigurations.${configuration_name}.config.environment.persistence.\"required-state/system\".persistentStoragePath")"
+  required_system_state__persistentStorage_path="$(nix eval --raw "${flake}nixosConfigurations.${configuration_name}.config.environment.persistence.\"state/required/system\".persistentStoragePath")"
   etc_dir="${extra_files}$required_system_state__persistentStorage_path/etc"
 
   ln --relative --symbolic --force "$etc_dir/machine-id" "$extra_files/etc"

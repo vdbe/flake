@@ -7,7 +7,19 @@
 }:
 {
   mymodules.base.disko.enable = true;
-  fileSystems."/persist".neededForBoot = true;
+
+  fileSystems = {
+    "/persist".neededForBoot = true;
+    "/persist/cache".neededForBoot = true;
+    "/persist/data".neededForBoot = true;
+    "/persist/state".neededForBoot = true;
+  };
+
+  boot = {
+    supportedFilesystems = [ "zfs" ];
+    zfs.requestEncryptionCredentials = [ "zroot" ];
+  };
+
   disko.devices = {
     disk = {
       main = {
@@ -31,50 +43,124 @@
                 mountpoint = "/boot";
               };
             };
-            luks = {
+            zfs = {
               size = "100%";
               content = {
-                type = "luks";
-                name = "crypted";
-                settings = {
-                  allowDiscards = true;
-                };
-                passwordFile = "/tmp/secret.key";
-                # additionalKeyFiles = [ "/tmp/additionalSecret.key" ];
-
-                content = {
-                  type = "btrfs";
-                  extraArgs = [ "-f" ]; # Override existing partition
-                  subvolumes = {
-                    "/@nix" = {
-                      mountOptions = [
-                        "compress=zstd:1"
-                        "noatime"
-                      ];
-                      mountpoint = "/nix";
-                    };
-                    "/@persist" = {
-                      mountOptions = [
-                        "compress=zstd:1"
-                        "noatime"
-                      ];
-                      mountpoint = "/persist";
-                    };
-                  };
-                };
+                type = "zfs";
+                pool = "zroot";
               };
             };
           };
         };
       };
     };
-    nodev."/" = {
-      fsType = "tmpfs";
-      mountOptions = [
-        "size=2G"
-        "defaults"
-        "mode=755"
-      ];
+    zpool = {
+      zroot = {
+        type = "zpool";
+        mountpoint = null;
+        # -O
+        rootFsOptions = {
+          acltype = "posixacl";
+          atime = "off";
+          compression = "zstd";
+          dnodesize = "auto";
+          normalization = "formD";
+          xattr = "sa";
+
+          # Encryption
+          encryption = "aes-256-gcm";
+          keyformat = "passphrase";
+          keylocation = "file:///tmp/secret.key";
+
+          "com.sun:auto-snapshot" = "false";
+        };
+        # -o
+        options = {
+          ashift = "12";
+          # autotrim = "on";
+        };
+
+        datasets = {
+          root = {
+            type = "zfs_fs";
+            mountpoint = "/";
+            options = {
+
+              "com.sun:auto-snapshot" = "false";
+            };
+            postCreateHook = ''
+              zfs snapshot zroot/root@blank
+              zfs snapshot zroot/root@lastboot
+            '';
+          };
+          home = {
+            type = "zfs_fs";
+            mountpoint = "/home";
+            options = {
+
+              "com.sun:auto-snapshot" = "true";
+            };
+          };
+          persist = {
+            type = "zfs_fs";
+            mountpoint = "/persist";
+            options = {
+              "com.sun:auto-snapshot" = "off";
+            };
+          };
+          "persist/state" = {
+            type = "zfs_fs";
+            mountpoint = "/persist/state";
+            options = {
+              "com.sun:auto-snapshot" = "on";
+            };
+          };
+          "persist/data" = {
+            type = "zfs_fs";
+            mountpoint = "/persist/data";
+            options = {
+              "com.sun:auto-snapshot" = "on";
+            };
+          };
+          "persist/cache" = {
+            type = "zfs_fs";
+            mountpoint = "/persist/cache";
+            options = {
+              "com.sun:auto-snapshot" = "on";
+              postCreateHook = "zfs snapshot zroot/persist/cache@blank";
+            };
+          };
+          nix = {
+            options = {
+              "com.sun:auto-snapshot" = "false";
+            };
+            type = "zfs_fs";
+          };
+          "nix/var" = {
+            type = "zfs_fs";
+            mountpoint = "/nix/var";
+            options = {
+
+              "com.sun:auto-snapshot" = "false";
+            };
+          };
+          "nix/store" = {
+            type = "zfs_fs";
+            mountpoint = "/nix/store";
+            options = {
+              "com.sun:auto-snapshot" = "false";
+            };
+          };
+          # zfs uses copy on write and requires some free space to delete files when the disk is completely filled
+          reserved = {
+            options = {
+              mountpoint = "none";
+              reservation = "5GiB";
+            };
+            type = "zfs_fs";
+          };
+        };
+      };
     };
   };
 }

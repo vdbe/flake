@@ -32,7 +32,8 @@
     };
 
     secrets.url = "git+ssh://git@github.com/vdbe/flake-secrets";
-    # secrets = { # For dev
+    # secrets = {
+    #   # For dev
     #   type = "git";
     #   url = "file:./";
     #   dir = "secrets";
@@ -51,11 +52,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
-    };
-
     # dev
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -63,6 +59,10 @@
     };
 
     # Support/util inputs
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
     flake-utils = {
       url = "github:numtide/flake-utils";
       inputs.systems.follows = "systems";

@@ -16,6 +16,7 @@ let
     ;
 
   inputsHasImpermanence = inputs ? impermanence;
+  rootFsType = config.fileSystems."/".fsType;
 
   persistenceMappedCategories = mapAttrs' (
     c: v:
@@ -83,7 +84,10 @@ in
             '';
           }
           {
-            assertion = builtins.elem config.fileSystems."/".fsType [ "tmpfs" ];
+            assertion = builtins.elem rootFsType [
+              "tmpfs"
+              "zfs"
+            ];
             message = ''
               root fsType '${config.fileSystems."/".fsType}' not supported by 'mymodules.base.persistence'
             '';
@@ -102,7 +106,7 @@ in
         # };
         environment.etc =
           let
-            stateSystemPath = config.environment.persistence."required-state/system".persistentStoragePath;
+            stateSystemPath = config.environment.persistence."state/required/system".persistentStoragePath;
           in
           {
             machine-id.source = "${stateSystemPath}/etc/machine-id";
@@ -110,14 +114,41 @@ in
             "ssh/ssh_host_ed25519_key.pub".source = "${stateSystemPath}/etc/ssh/ssh_host_ed25519_key.pub";
           };
 
-        mymodules.base.persistence.categories."required-state/system" = {
+        mymodules.base.persistence.categories."state/required/system" = {
           hideMounts = true;
           directories = [
-            "/var/lib/nixos" # https://github.com/NixOS/nixpkgs/blob/2e359fb3162c85095409071d131e08252d91a14f/nixos/doc/manual/administration/nixos-state.section.md#boot-sec-state-boot
-            "/var/lib/systemd" # https://github.com/NixOS/nixpkgs/blob/2e359fb3162c85095409071d131e08252d91a14f/nixos/doc/manual/administration/systemd-state.section.md#varlibsystemd-sec-var-systemd
-            "/var/log" # https://github.com/NixOS/nixpkgs/blob/2e359fb3162c85095409071d131e08252d91a14f/nixos/doc/manual/administration/systemd-state.section.md#varlogjournalmachine-id-sec-var-journal
+            {
+              # https://github.com/NixOS/nixpkgs/blob/2e359fb3162c85095409071d131e08252d91a14f/nixos/doc/manual/administration/nixos-state.section.md#boot-sec-state-boot
+              directory = "/var/lib/nixos";
+              mode = "755";
+            }
+            {
+              # https://github.com/NixOS/nixpkgs/blob/2e359fb3162c85095409071d131e08252d91a14f/nixos/doc/manual/administration/systemd-state.section.md#varlibsystemd-sec-var-systemd
+              directory = "/var/lib/systemd";
+              mode = "755";
+            }
+            {
+
+              # https://github.com/NixOS/nixpkgs/blob/2e359fb3162c85095409071d131e08252d91a14f/nixos/doc/manual/administration/systemd-state.section.md#varlogjournalmachine-id-sec-var-journal
+              directory = "/var/log";
+              mode = "755";
+            }
           ];
         };
+      })
+
+      (mkIf (rootFsType == "zfs") {
+        boot.initrd.postDeviceCommands = lib.mkAfter (
+          let
+            rootDataSet = config.fileSystems."/".device;
+          in
+          ''
+            zfs destroy ${rootDataSet}@lastboot
+            zfs snapshot ${rootDataSet}@lastboot
+            zfs rollback -r ${rootDataSet}@blank
+          ''
+        );
+
       })
     ]
 
