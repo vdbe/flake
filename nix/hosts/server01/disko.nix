@@ -17,7 +17,6 @@
 
   boot = {
     supportedFilesystems = [ "zfs" ];
-    zfs.requestEncryptionCredentials = [ "zroot" ];
   };
 
   disko.devices = {
@@ -72,6 +71,7 @@
           keyformat = "passphrase";
           keylocation = "file:///tmp/secret.key";
 
+          canmount = "off";
           "com.sun:auto-snapshot" = "false";
         };
         # -o
@@ -79,6 +79,9 @@
           ashift = "12";
           # autotrim = "on";
         };
+        postCreateHook = ''
+          zfs set keylocation=prompt zroot
+        '';
 
         datasets = {
           root = {
@@ -127,11 +130,19 @@
             mountpoint = "/persist/cache";
             options = {
               "com.sun:auto-snapshot" = "on";
-              postCreateHook = "zfs snapshot zroot/persist/cache@blank";
             };
+            postCreateHook = "zfs snapshot zroot/persist/cache@blank";
+          };
+          microvms = {
+            options = {
+              canmount = "off";
+              "com.sun:auto-snapshot" = "false";
+            };
+            type = "zfs_fs";
           };
           nix = {
             options = {
+              canmount = "off";
               "com.sun:auto-snapshot" = "false";
             };
             type = "zfs_fs";
@@ -140,7 +151,6 @@
             type = "zfs_fs";
             mountpoint = "/nix/var";
             options = {
-
               "com.sun:auto-snapshot" = "false";
             };
           };
@@ -154,6 +164,7 @@
           # zfs uses copy on write and requires some free space to delete files when the disk is completely filled
           reserved = {
             options = {
+              canmount = "off";
               mountpoint = "none";
               reservation = "5GiB";
             };

@@ -37,6 +37,15 @@ let
   cfg = config.mymodules.base.persistence;
 in
 {
+  imports = [
+    (
+      if inputsHasImpermanence then
+        inputs.impermanence.nixosModules.impermanence
+      else
+        { options.environment.persistence = mkSinkUndeclaredOptions { }; }
+    )
+  ];
+
   options.mymodules.base.persistence = {
     enable = mkEnableOption "persistence";
     requiredState = (mkEnableOption "Required state") // {
@@ -58,20 +67,7 @@ in
       type = types.attrsOf types.anything;
       default = { };
     };
-    test = mkOption {
-      default = persistenceMappedCategories;
-      type = types.anything;
-    };
   };
-
-  imports = [
-    (
-      if inputsHasImpermanence then
-        inputs.impermanence.nixosModules.impermanence
-      else
-        { options.environment.persistence = mkSinkUndeclaredOptions { }; }
-    )
-  ];
 
   config = mkIf cfg.enable (
     mkMerge [

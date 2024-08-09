@@ -59,7 +59,7 @@ persistence="$(nix eval "${flake}nixosConfigurations.${configuration_name}.confi
 
 mkdir -p "$extra_files/etc"
 if [[ "$persistence" == "true" ]]; then
-  required_system_state__persistentStorage_path="$(nix eval --raw "${flake}nixosConfigurations.${configuration_name}.config.environment.persistence.\"state/required/system\".persistentStoragePath")"
+  required_system_state__persistentStorage_path="$(nix eval --raw "${flake}nixosConfigurations.${configuration_name}.config.environment.persistence.\"state/system\".persistentStoragePath")"
   etc_dir="${extra_files}$required_system_state__persistentStorage_path/etc"
 
   ln --relative --symbolic --force "$etc_dir/machine-id" "$extra_files/etc"
@@ -89,7 +89,7 @@ sops_decrypt_key "$system_stage0_sops_file" "machine_id" >"$etc_dir/machine-id"
 
 sops_decrypt_key "$system_stage0_sops_file" "luks_secret_key" >"$disk_encryption_key"
 
-umask 0222
+umask 0022
 
 rm -f "$SOPS_AGE_KEY_FILE"
 

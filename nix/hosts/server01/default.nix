@@ -4,6 +4,8 @@
     inputs.self.nixosModules.core
     inputs.self.nixosModules.base
     inputs.self.nixosModules.default
+    inputs.self.nixosModules.microvm
+    inputs.self.nixosModules.microvm-host
 
     ./hardware-configuration.nix
     (import ./disko.nix { inherit (config.mm.b.secrets.host.extra.disko) disks; })
@@ -17,9 +19,43 @@
     };
     services = {
       openssh.enable = true;
-      tailscale.enable = true;
+      tailscale.enable = false;
+    };
+
+    microvm = {
+      enable = true;
+      host = {
+        enable = true;
+        baseZfsDataset = "zroot/microvms";
+        vms = {
+          test01 = inputs.self.unevaluatedNixosConfigurations.test01;
+        };
+      };
     };
   };
+
+  networking.useNetworkd = true;
+  systemd.network.networks = {
+    "10-microvm" = {
+      enable = true;
+      matchConfig = {
+        name = "mv-*";
+      };
+      linkConfig = {
+        Unmanaged = true;
+        # AdministrativeState = "down";
+      };
+    };
+  };
+
+  systemd.services = {
+    "microvm@test01" = {
+      serviceConfig = {
+        SupplementaryGroups = "disk";
+      };
+    };
+  };
+  nixpkgs.config.allowAliases = true;
 
   sops.secrets.hashed_password.neededForUsers = true;
   users = {

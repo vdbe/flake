@@ -8,6 +8,9 @@ let
     "core"
     "base"
     "default"
+    "microvm"
+    "microvm-host"
+    "microvm-guest"
   ];
 
 in

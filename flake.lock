@@ -20,6 +20,25 @@
         "type": "github"
       }
     },
+    "fenix": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "rust-analyzer-src": "rust-analyzer-src"
+      },
+      "locked": {
+        "lastModified": 1723185066,
+        "narHash": "sha256-u7guFfIrfspwUp6/SEWCDhs2tVoE1fcgft0Fw7LdNEU=",
+        "owner": "nix-community",
+        "repo": "fenix",
+        "rev": "d5f1b280af93acddbcce948d946bb5db2f8035fe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "fenix",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -52,11 +71,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1722612983,
-        "narHash": "sha256-3eBZg+EFGKSwIAOcftZmPox4/SDIgMs6hyD0mKFOc2w=",
+        "lastModified": 1723211777,
+        "narHash": "sha256-LoTzFl1kCZGp92l3xnC8MMJTWIhhOZPxb6VBuKsDKm4=",
         "owner": "vdbe",
         "repo": "flake-secrets-wrapper",
-        "rev": "b040fdf1a4d2f933bd6c39a3abcd1bed6716e423",
+        "rev": "2d35cc0c103d6ea5c3d78cf5204dfd7f0d10b9a9",
         "type": "github"
       },
       "original": {
@@ -100,13 +119,38 @@
         "type": "github"
       }
     },
+    "microvm": {
+      "inputs": {
+        "fenix": "fenix",
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "spectrum": []
+      },
+      "locked": {
+        "lastModified": 1722696400,
+        "narHash": "sha256-8bz0+XpjGgio5Bjte0PWsYRArVR2godIBoArly0D+HU=",
+        "owner": "astro",
+        "repo": "microvm.nix",
+        "rev": "dc326ff7fa41aa5cc210b99617743bbc51275924",
+        "type": "github"
+      },
+      "original": {
+        "owner": "astro",
+        "repo": "microvm.nix",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1722421184,
-        "narHash": "sha256-/DJBI6trCeVnasdjUo9pbnodCLZcFqnVZiLUfqLH4jA=",
+        "lastModified": 1722813957,
+        "narHash": "sha256-IAoYyYnED7P8zrBFMnmp7ydaJfwTnwcnqxUElC1I26Y=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "9f918d616c5321ad374ae6cb5ea89c9e04bf3e58",
+        "rev": "cb9a96f23c491c081b38eab96d22fa958043c9fa",
         "type": "github"
       },
       "original": {
@@ -148,12 +192,29 @@
         "type": "github"
       }
     },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1722813957,
+        "narHash": "sha256-IAoYyYnED7P8zrBFMnmp7ydaJfwTnwcnqxUElC1I26Y=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "cb9a96f23c491c081b38eab96d22fa958043c9fa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "disko": "disko",
         "flake-parts": "flake-parts",
         "flake-utils": "flake-utils",
         "impermanence": "impermanence",
+        "microvm": "microvm",
         "nixpkgs": [
           "nixpkgs-unstable"
         ],
@@ -166,24 +227,44 @@
         "treefmt-nix": "treefmt-nix"
       }
     },
+    "rust-analyzer-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1722521768,
+        "narHash": "sha256-FvJ4FaMy1kJbZ3Iw1RyvuiUAsbHJXoU2HwylzaFzj1o=",
+        "owner": "rust-lang",
+        "repo": "rust-analyzer",
+        "rev": "f149dc5029d8406fae8b2c541603bcac06e30deb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rust-lang",
+        "ref": "nightly",
+        "repo": "rust-analyzer",
+        "type": "github"
+      }
+    },
     "secrets": {
       "inputs": {
         "flake-secrets-wrapper": "flake-secrets-wrapper",
-        "nixpkgs": "nixpkgs",
+        "nixpkgs": "nixpkgs_2",
         "systems": []
       },
       "locked": {
-        "lastModified": 1723063003,
-        "narHash": "sha256-zugU7EHkJAfa3/kVa0910GFZhMD+dv385XnbC9ZsrA4=",
-        "ref": "refs/heads/main",
-        "rev": "790bf09e49941fe7b8a71a44d59c183f81e45874",
-        "revCount": 5,
+        "dir": "secrets",
+        "dirtyRev": "2d1f00e7caf8e53d994d069f4f76c75317545d0b-dirty",
+        "dirtyShortRev": "2d1f00e-dirty",
+        "lastModified": 1723063469,
+        "narHash": "sha256-pDMNzngvtsIHrcMLXHT7mm2xiw3KDy3KUlD5Sxs8HdY=",
+        "submodules": true,
         "type": "git",
-        "url": "ssh://git@github.com/vdbe/flake-secrets"
+        "url": "file:./"
       },
       "original": {
+        "dir": "secrets",
+        "submodules": true,
         "type": "git",
-        "url": "ssh://git@github.com/vdbe/flake-secrets"
+        "url": "file:./"
       }
     },
     "sops-nix": {
