@@ -251,20 +251,17 @@
         "systems": []
       },
       "locked": {
-        "dir": "secrets",
-        "dirtyRev": "2d1f00e7caf8e53d994d069f4f76c75317545d0b-dirty",
-        "dirtyShortRev": "2d1f00e-dirty",
-        "lastModified": 1723063469,
-        "narHash": "sha256-pDMNzngvtsIHrcMLXHT7mm2xiw3KDy3KUlD5Sxs8HdY=",
-        "submodules": true,
+        "lastModified": 1723226318,
+        "narHash": "sha256-IxgEuu4PBspHdSxrzbScO5qsKqRBc2N6iq19x1ZhA0A=",
+        "ref": "refs/heads/main",
+        "rev": "0a9b332a6490efdb7b7b5abffd99249f4c4537f4",
+        "revCount": 7,
         "type": "git",
-        "url": "file:./"
+        "url": "ssh://git@github.com/vdbe/flake-secrets"
       },
       "original": {
-        "dir": "secrets",
-        "submodules": true,
         "type": "git",
-        "url": "file:./"
+        "url": "ssh://git@github.com/vdbe/flake-secrets"
       }
     },
     "sops-nix": {

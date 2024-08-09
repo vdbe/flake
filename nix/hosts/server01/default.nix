@@ -28,7 +28,7 @@
         enable = true;
         baseZfsDataset = "zroot/microvms";
         vms = {
-          test01 = inputs.self.unevaluatedNixosConfigurations.test01;
+          inherit (inputs.self.unevaluatedNixosConfigurations) test01;
         };
       };
     };
@@ -72,7 +72,7 @@
 
   networking = {
     hostName = "server01";
-    hostId = config.mm.b.secrets.host.extra.hostId;
+    inherit (config.mm.b.secrets.host.extra) hostId;
   };
 
   boot.loader.systemd-boot.enable = true;

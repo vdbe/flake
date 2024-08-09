@@ -10,7 +10,6 @@ let
   inherit (lib.options) mkSinkUndeclaredOptions;
 
   inherit (config.mymodules) base;
-  persistenceEnabled = base.persistence.enable;
   rootFsType = config.fileSystems."/".fsType;
 
   inputsHasMicrovm = inputs ? microvm;
@@ -93,7 +92,7 @@ in
           }) cfg.vms;
         };
 
-        mymodules.base.persistence.categories = mkIf ((cfg.baseZfsDataset == null)) {
+        mymodules.base.persistence.categories = mkIf (cfg.baseZfsDataset == null) {
           "state/microvms" = {
             directories = [ config.microvm.stateDir ];
 
