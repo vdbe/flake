@@ -9,7 +9,6 @@ let
   inherit (lib.modules) mkIf mkMerge mkDefault;
   inherit (lib.options) mkSinkUndeclaredOptions;
 
-  inherit (config.mymodules) base;
   rootFsType = config.fileSystems."/".fsType;
 
   inputsHasMicrovm = inputs ? microvm;
@@ -34,12 +33,6 @@ in
   };
 
   config = mkMerge [
-    {
-      microvm.host.enable = lib.mkForce cfg.enable;
-      mymodules = {
-        importedModules = mkDefault [ "microvm-host" ];
-      };
-    }
     (mkIf cfg.enable (mkMerge [
       {
         assertions = [
@@ -71,7 +64,6 @@ in
 
           host = {
             enable = mkDefault true;
-            useNotifySockets = mkDefault true;
           };
 
           vms = builtins.mapAttrs (_: v: {
@@ -84,7 +76,6 @@ in
               imports = [ ../guest.nix ] ++ v.modules;
 
               mymodules.microvm = {
-                enable = true;
                 guest.enable = true;
               };
             };

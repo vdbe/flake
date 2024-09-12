@@ -31,14 +31,14 @@
       };
     };
 
-    secrets.url = "git+ssh://git@github.com/vdbe/flake-secrets";
-    # secrets = {
-    #   # For dev
-    #   type = "git";
-    #   url = "file:./";
-    #   dir = "secrets";
-    #   submodules = true;
-    # };
+    # secrets.url = "git+ssh://git@github.com/vdbe/flake-secrets";
+    secrets = {
+      # For dev
+      type = "git";
+      url = "file:./";
+      dir = "secrets";
+      submodules = true;
+    };
     secrets.inputs = {
       systems.follows = "";
     };
@@ -59,7 +59,6 @@
         nixpkgs.follows = "nixpkgs";
         flake-utils.follows = "flake-utils";
         spectrum.follows = "";
-        fenix.inputs.rust-analyzer-src.follows = "";
       };
     };
 

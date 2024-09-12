@@ -16,7 +16,7 @@ let
     ;
 
   inputsHasImpermanence = inputs ? impermanence;
-  rootFsType = config.fileSystems."/".fsType;
+  rootFsType = config.fileSystems."/".fsType or "tmpfs";
 
   persistenceMappedCategories = mapAttrs' (
     c: v:
@@ -134,11 +134,12 @@ in
       })
 
       (mkIf (rootFsType == "zfs") {
-        boot.initrd.postDeviceCommands = lib.mkAfter (
+        boot.initrd.postResumeCommands = lib.mkAfter (
           let
             rootDataSet = config.fileSystems."/".device;
           in
           ''
+            echo "rolling back \"/\" to a clean state"
             zfs destroy ${rootDataSet}@lastboot
             zfs snapshot ${rootDataSet}@lastboot
             zfs rollback -r ${rootDataSet}@blank

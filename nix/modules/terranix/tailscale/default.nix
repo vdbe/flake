@@ -59,54 +59,50 @@ let
   aclOpts =
     { config, ... }:
     let
-      aclsOpts =
-        _:
-        {
-          options = {
-            action = mkOption {
-              type = types.enum [ "accept" ];
-              default = "accept";
-            };
-            src = mkOption {
-              type = coercedListOf types.str;
-              default = [ ];
-            };
-            dst = mkOption {
-              type = coercedListOf types.str;
-              default = [ ];
-            };
-            proto = mkOption {
-              # TODO: proto enum
-              type = types.nullOr types.str;
-              default = null;
-            };
+      aclsOpts = _: {
+        options = {
+          action = mkOption {
+            type = types.enum [ "accept" ];
+            default = "accept";
           };
-
-        };
-
-      testOpts =
-        _:
-        {
-          options = {
-            src = mkOption { type = types.str; };
-            srcPostureAttrs = mkOption {
-              type = types.nullOr (types.attrsOf types.str);
-              default = null;
-            };
-            proto = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-            };
-            accept = mkOption {
-              type = types.nullOr (types.nonEmptyListOf types.str);
-              default = null;
-            };
-            deny = mkOption {
-              type = types.nullOr (types.nonEmptyListOf types.str);
-              default = null;
-            };
+          src = mkOption {
+            type = coercedListOf types.str;
+            default = [ ];
+          };
+          dst = mkOption {
+            type = coercedListOf types.str;
+            default = [ ];
+          };
+          proto = mkOption {
+            # TODO: proto enum
+            type = types.nullOr types.str;
+            default = null;
           };
         };
+
+      };
+
+      testOpts = _: {
+        options = {
+          src = mkOption { type = types.str; };
+          srcPostureAttrs = mkOption {
+            type = types.nullOr (types.attrsOf types.str);
+            default = null;
+          };
+          proto = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+          };
+          accept = mkOption {
+            type = types.nullOr (types.nonEmptyListOf types.str);
+            default = null;
+          };
+          deny = mkOption {
+            type = types.nullOr (types.nonEmptyListOf types.str);
+            default = null;
+          };
+        };
+      };
 
     in
     {

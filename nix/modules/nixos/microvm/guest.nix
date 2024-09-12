@@ -12,22 +12,23 @@ in
 
   config = mkMerge [
     {
-      microvm.guest.enable = lib.mkForce cfg.enable;
+      # microvm.guest.enable = lib.mkForce cfg.enable;
 
-      mymodules = {
-        importedModules = mkDefault [ "microvm-guest" ];
-      };
+      # mymodules = {
+      #   importedModules = mkDefault [ "microvm-guest" ];
+      # };
 
     }
-    (mkIf cfg.enable {
-      boot = {
-        loader.systemd-boot.enable = true;
-      };
-
+    (mkIf true {
+      # (mkIf cfg.enable {
+      # boot = {
+      #   loader.systemd-boot.enable = true;
+      # };
+      #
       microvm = {
-        # hypervisor = lib.mkDefault "cloud-hypervisor";
+        hypervisor = lib.mkDefault "cloud-hypervisor";
         mem = lib.mkDefault 512;
-        vcpu = lib.mkDefault 1;
+        vcpu = lib.mkDefault 4;
 
         interfaces = builtins.attrValues (
           mapAttrs (_: interface: {
@@ -48,7 +49,7 @@ in
               mountPoint = "/nix/.ro-store";
               tag = "store";
               proto = "virtiofs";
-              socket = "store.socket";
+              # socket = "store.socket";
             }
           ]
           ++ map (
@@ -62,7 +63,7 @@ in
               mountPoint = "/${dir'}";
               inherit tag;
               proto = "virtiofs";
-              socket = "${tag}.socket";
+              # socket = "${tag}.socket";
             }
           ) cfg.mounts;
       };

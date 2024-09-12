@@ -1,7 +1,6 @@
 {
   config,
   inputs,
-  lib,
   ...
 }:
 {
@@ -21,21 +20,13 @@
     services = {
       openssh.enable = true;
     };
-    microvm.guest = {
-      interfaces.lan = {
-        type = "macvtap";
-
-        macvtap = {
-          link = "enp2s0";
-          mode = "bridge";
-        };
-      };
-    };
   };
 
-  fileSystems."/" = lib.mkDefault { fsType = "tmpfs"; };
+  fileSystems."/" = {
+    fsType = "tmpfs";
+  };
   boot = {
-    loader.systemd-boot.enable = lib.mkDefault true;
+    loader.systemd-boot.enable = true;
   };
 
   sops.secrets.hashed_password.neededForUsers = true;

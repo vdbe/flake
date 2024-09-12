@@ -1,4 +1,9 @@
-{ config, inputs, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 {
   imports = [
     inputs.self.nixosModules.core
@@ -8,6 +13,7 @@
     inputs.self.nixosModules.microvm-host
 
     ./hardware-configuration.nix
+    ./pci-passthrough.nix
     (import ./disko.nix { inherit (config.mm.b.secrets.host.extra.disko) disks; })
   ];
   mymodules = {
@@ -23,13 +29,27 @@
     };
 
     microvm = {
-      enable = true;
       host = {
         enable = true;
         baseZfsDataset = "zroot/microvms";
-        vms = {
-          inherit (inputs.self.unevaluatedNixosConfigurations) test01;
-        };
+        vms = lib.mkMerge [
+          {
+            inherit (inputs.self.unevaluatedNixosConfigurations) test01;
+          }
+          {
+            # host specific overrides for guests
+            test01.modules = [
+              {
+                microvm.devices = [
+                  {
+                    bus = "pci";
+                    path = "0000:02:00.0";
+                  }
+                ];
+              }
+            ];
+          }
+        ];
       };
     };
   };
@@ -48,13 +68,6 @@
     };
   };
 
-  systemd.services = {
-    "microvm@test01" = {
-      serviceConfig = {
-        SupplementaryGroups = "disk";
-      };
-    };
-  };
   nixpkgs.config.allowAliases = true;
 
   sops.secrets.hashed_password.neededForUsers = true;
@@ -75,28 +88,34 @@
     inherit (config.mm.b.secrets.host.extra) hostId;
   };
 
-  boot.loader.systemd-boot.enable = true;
-
   sops.secrets.initrd_host_key = {
     key = "initrd/ssh_host_ed25519_key";
   };
-  boot.zfs.requestEncryptionCredentials = [ "zroot" ];
-  boot.initrd = {
-    availableKernelModules = [ "r8169" ];
-    network = {
-      enable = true;
-      # postCommands = ''
-      #   echo "zfs load-key -a; killall zfs" >> /root/.profile
-      # '';
-      udhcpc.extraArgs = [
-        "--background"
-        "&"
-      ];
-      ssh = {
+
+  boot = {
+    loader = {
+      efi.canTouchEfiVariables = true;
+      systemd-boot.enable = true;
+    };
+
+    zfs.requestEncryptionCredentials = [ "zroot" ];
+    initrd = {
+      availableKernelModules = [ "r8169" ];
+      network = {
         enable = true;
-        port = 22;
-        authorizedKeys = config.secrets.extra.hostKeys.admin;
-        hostKeys = [ config.sops.secrets.initrd_host_key.path ];
+        # postCommands = ''
+        #   echo "zfs load-key -a; killall zfs" >> /root/.profile
+        # '';
+        udhcpc.extraArgs = [
+          "--background"
+          "&"
+        ];
+        ssh = {
+          enable = true;
+          port = 22;
+          authorizedKeys = config.secrets.extra.hostKeys.admin;
+          hostKeys = [ config.sops.secrets.initrd_host_key.path ];
+        };
       };
     };
   };

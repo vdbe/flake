@@ -59,7 +59,7 @@ persistence="$(nix eval "${flake}nixosConfigurations.${configuration_name}.confi
 
 mkdir -p "$extra_files/etc"
 if [[ "$persistence" == "true" ]]; then
-  required_system_state__persistentStorage_path="$(nix eval --raw "${flake}nixosConfigurations.${configuration_name}.config.environment.persistence.\"state/system\".persistentStoragePath")"
+  required_system_state__persistentStorage_path="$(nix eval --raw "${flake}nixosConfigurations.${configuration_name}.config.environment.persistence.\"state/required/system\".persistentStoragePath")"
   etc_dir="${extra_files}$required_system_state__persistentStorage_path/etc"
 
   ln --relative --symbolic --force "$etc_dir/machine-id" "$extra_files/etc"
@@ -97,4 +97,4 @@ nix run github:nix-community/nixos-anywhere -- \
   --flake "${flake}${configuration_name}" \
   --extra-files "$extra_files" \
   --disk-encryption-keys "/tmp/secret.key" "$disk_encryption_key" \
-  $@
+  "$@"

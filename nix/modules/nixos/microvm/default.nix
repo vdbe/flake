@@ -119,7 +119,6 @@ in
 # cfg = config.mymodules.microvm;
 {
   options.mymodules.microvm = {
-    enable = mkEnableOption "microvm";
     host = {
       enable = mkEnableOption "microvm host";
       baseZfsDataset = mkOption {
