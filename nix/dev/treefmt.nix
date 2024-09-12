@@ -6,15 +6,34 @@ in
 {
   imports = [ treefmt-nix.flakeModule ];
 
-  perSystem = {
-    treefmt = {
-      projectRootFile = ".git/config";
+  perSystem =
+    { lib, pkgs, ... }:
+    {
+      treefmt = {
+        projectRootFile = ".git/config";
 
-      programs = {
-        deadnix.enable = true;
-        nixfmt.enable = true;
-        statix.enable = true;
+        programs = {
+          # nix
+          deadnix.enable = true;
+          nixfmt.enable = true;
+          statix.enable = true;
+
+          # bash
+          shellcheck.enable = true;
+          shfmt.enable = true;
+
+          # remainder
+          actionlint.enable = true;
+        };
+
+        settings = {
+          formatter = {
+            "typos" = {
+              command = lib.meta.getExe pkgs.typos;
+              includes = [ "*" ];
+            };
+          };
+        };
       };
     };
-  };
 }

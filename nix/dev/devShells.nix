@@ -1,28 +1,28 @@
 {
   perSystem =
-    { self', pkgs, ... }:
+    {
+      self',
+      pkgs,
+      config,
+      ...
+    }:
     {
       devShells = {
         default = pkgs.mkShellNoCC {
+          inputsFrom = [ config.treefmt.build.devShell ];
           packages =
             (with pkgs; [
 
-              # nix: sp + format + lint
-              deadnix
+              # nix: lsp
               nixd
-              nixfmt-rfc-style
-              statix
 
               # secrets
               sops
               age
               ssh-to-age
 
-              # bash
+              # bash: lsp
               nodePackages.bash-language-server
-              shellcheck
-              shfmt
-
             ])
             ++ [
               # terranix

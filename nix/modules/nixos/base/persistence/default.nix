@@ -55,7 +55,7 @@ in
     persistentStoragePath = mkOption {
       default = "/persist";
       example = "/mnt/persist";
-      description = "Absoulte path of persistent storage.";
+      description = "Absolute path of persistent storage.";
       type = types.path;
     };
     hideMounts = mkOption {

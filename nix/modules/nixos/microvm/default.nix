@@ -141,7 +141,7 @@ in
       mountBase = mkOption {
         description = "Location (ZFS dataset, ...) where all the shares live.";
         type = types.path;
-        # NOTE: Chan be a diffrent path
+        # NOTE: Can be a different path
         default = "/var/lib/microvms/${hostName}";
       };
       interfaces = mkOption {

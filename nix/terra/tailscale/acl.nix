@@ -45,14 +45,14 @@ in
       }
     ]
     ++ (concatLists [
-      # Check if no acess is provided _from_ `informationalTags`
+      # Check if no access is provided _from_ `informationalTags`
       (map (src: {
         inherit src;
         deny = mkDestinations (attrValues tags) defaultPorts;
 
       }) informationalTags)
 
-      # Check if no acess is provided _to_ `informationalTags`
+      # Check if no access is provided _to_ `informationalTags`
       (map (src: {
         inherit src;
         deny = mkDestinations informationalTags defaultPorts;

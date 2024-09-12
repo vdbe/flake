@@ -22,7 +22,7 @@ abort() {
 sops_decrypt_key() {
   file="$1"
   key="$2"
-  sops --extract '["'$key'"]' --decrypt "$file"
+  sops --extract "[\"$key\"]" --decrypt "$file"
 }
 
 flake=".#"
@@ -58,7 +58,7 @@ system_stage0_sops_file="$(nix eval "${flake}nixosConfigurations.${configuration
 persistence="$(nix eval "${flake}nixosConfigurations.${configuration_name}.config.mm.b.persistence.enable")"
 
 mkdir -p "$extra_files/etc"
-if [[ "$persistence" == "true" ]]; then
+if [[ $persistence == "true" ]]; then
   required_system_state__persistentStorage_path="$(nix eval --raw "${flake}nixosConfigurations.${configuration_name}.config.environment.persistence.\"state/required/system\".persistentStoragePath")"
   etc_dir="${extra_files}$required_system_state__persistentStorage_path/etc"
 
