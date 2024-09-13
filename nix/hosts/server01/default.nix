@@ -54,20 +54,6 @@
     };
   };
 
-  networking.useNetworkd = true;
-  systemd.network.networks = {
-    "10-microvm" = {
-      enable = true;
-      matchConfig = {
-        name = "mv-*";
-      };
-      linkConfig = {
-        Unmanaged = true;
-        # AdministrativeState = "down";
-      };
-    };
-  };
-
   nixpkgs.config.allowAliases = true;
 
   sops.secrets.hashed_password.neededForUsers = true;
@@ -103,9 +89,7 @@
       availableKernelModules = [ "r8169" ];
       network = {
         enable = true;
-        # postCommands = ''
-        #   echo "zfs load-key -a; killall zfs" >> /root/.profile
-        # '';
+        # TODO: only setup interface enp1so
         udhcpc.extraArgs = [
           "--background"
           "&"

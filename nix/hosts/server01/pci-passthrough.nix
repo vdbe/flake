@@ -8,7 +8,6 @@ _: {
       "vfio"
       "vfio_iommu_type1"
       "vfio_pci"
-      "vfio_virqfd"
     ];
 
     # TODO: extract all this info from micrvom.vm's

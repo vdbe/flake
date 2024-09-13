@@ -1,4 +1,5 @@
 {
+  lib,
   config,
   inputs,
   ...
@@ -22,12 +23,7 @@
     };
   };
 
-  fileSystems."/" = {
-    fsType = "tmpfs";
-  };
-  boot = {
-    loader.systemd-boot.enable = true;
-  };
+  networking.usePredictableInterfaceNames = false;
 
   sops.secrets.hashed_password.neededForUsers = true;
   users = {
@@ -41,6 +37,18 @@
     };
   };
   security.sudo.wheelNeedsPassword = false;
+
+  fileSystems."/" = lib.modules.mkIf (!config.mymodules.microvm.guest.enable) {
+    fsType = "tmpfs";
+    options = [
+      "size=2G"
+      "defaults"
+      "mode=755"
+    ];
+  };
+  boot = {
+    loader.systemd-boot.enable = true;
+  };
 
   networking.hostName = "test01";
   system.stateVersion = "24.11";
