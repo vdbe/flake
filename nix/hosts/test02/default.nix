@@ -1,8 +1,8 @@
 {
   lib,
   config,
-  inputs,
   pkgs,
+  inputs,
   ...
 }:
 {
@@ -11,8 +11,6 @@
     inputs.self.nixosModules.base
     inputs.self.nixosModules.default
     inputs.self.nixosModules.microvm
-
-    ./router.nix
   ];
   mymodules = {
     base = {
@@ -39,6 +37,29 @@
   };
   security.sudo.wheelNeedsPassword = false;
 
+  networking = {
+    useDHCP = false;
+    interfaces = {
+      # Handle the VLANs
+      wan.useDHCP = true;
+      enp0s2 = {
+        ipv4.addresses = [
+          {
+            address = "10.1.1.22";
+            prefixLength = 24;
+          }
+        ];
+      };
+    };
+  };
+
+  environment.defaultPackages = [
+    pkgs.tmux
+    pkgs.iperf3
+    pkgs.nload
+  ];
+  networking.firewall.enable = lib.mkForce false;
+
   fileSystems."/" = lib.modules.mkIf (!config.mymodules.microvm.guest.enable) {
     fsType = "tmpfs";
     options = [
@@ -51,13 +72,6 @@
     loader.systemd-boot.enable = true;
   };
 
-  environment.defaultPackages = [
-    pkgs.tmux
-    pkgs.iperf3
-    pkgs.nload
-  ];
-  networking.firewall.enable = lib.mkForce false;
-
-  networking.hostName = "test01";
+  networking.hostName = "test02";
   system.stateVersion = "24.11";
 }

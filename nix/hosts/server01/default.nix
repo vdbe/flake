@@ -34,23 +34,109 @@
         baseZfsDataset = "zroot/microvms";
         vms = lib.mkMerge [
           {
-            inherit (inputs.self.unevaluatedNixosConfigurations) test01;
+            inherit (inputs.self.unevaluatedNixosConfigurations)
+              test01
+              test02
+              test03
+              ;
           }
           {
             # host specific overrides for guests
-            test01.modules = [
-              {
-                microvm.devices = [
-                  {
-                    bus = "pci";
-                    path = "0000:02:00.0";
-                  }
-                ];
-              }
-            ];
+            test01 = {
+              autostart = true;
+              modules = [
+                {
+                  microvm = {
+                    devices = [
+                      {
+                        bus = "pci";
+                        path = "0000:02:00.0";
+                      }
+                    ];
+                  };
+                }
+              ];
+            };
+            test02 = {
+              autostart = true;
+              modules = [
+                {
+                  services.openssh.settings.PasswordAuthentication = lib.mkForce true;
+
+                  mymodules = {
+                    microvm.guest = {
+                      interfaces.lan = {
+                        type = "macvtap";
+
+                        macvtap = {
+                          link = "lan";
+                          mode = "bridge";
+                        };
+                      };
+                    };
+                  };
+                }
+              ];
+            };
+            test03 = {
+              autostart = true;
+              modules = [
+                {
+                  services.openssh = {
+                    settings = {
+                      PermitRootLogin = lib.mkForce "yes";
+                      PasswordAuthentication = lib.mkForce true;
+                    };
+                  };
+
+                  mymodules = {
+                    microvm.guest = {
+                      interfaces.lan = {
+                        type = "macvtap";
+
+                        macvtap = {
+                          link = "lan";
+                          mode = "bridge";
+                        };
+                      };
+                    };
+                  };
+                }
+              ];
+            };
           }
         ];
       };
+    };
+  };
+
+  networking = {
+    hostName = "server01";
+    inherit (config.mm.b.secrets.host.extra) hostId;
+
+    useDHCP = false;
+    vlans = {
+      wan = {
+        id = 10;
+        interface = "enp1s0";
+      };
+      lan = {
+        id = 20;
+        interface = "enp1s0";
+      };
+    };
+
+    interfaces = {
+      # Handle the VLANs
+      wan.useDHCP = true;
+      # lan = {
+      #   ipv4.addresses = [
+      #     {
+      #       address = "10.1.1.10";
+      #       prefixLength = 24;
+      #     }
+      #   ];
+      # };
     };
   };
 
@@ -68,11 +154,6 @@
     };
   };
   security.sudo.wheelNeedsPassword = false;
-
-  networking = {
-    hostName = "server01";
-    inherit (config.mm.b.secrets.host.extra) hostId;
-  };
 
   sops.secrets.initrd_host_key = {
     key = "initrd/ssh_host_ed25519_key";
