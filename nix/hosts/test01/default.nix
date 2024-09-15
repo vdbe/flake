@@ -55,9 +55,29 @@
     pkgs.tmux
     pkgs.iperf3
     pkgs.nload
+    pkgs.htop
   ];
   networking.firewall.enable = lib.mkForce false;
 
   networking.hostName = "test01";
   system.stateVersion = "24.11";
+
+  services.prometheus = {
+    exporters = {
+      node = {
+        enable = true;
+        extraFlags = [
+          "--collector.filesystem.mount-points-exclude=^/(nix/store)($|/)"
+        ];
+        enabledCollectors = [
+          "logind"
+          "processes"
+          "systemd"
+          "interrupts"
+          "tcpstat"
+        ];
+        port = 9002;
+      };
+    };
+  };
 }

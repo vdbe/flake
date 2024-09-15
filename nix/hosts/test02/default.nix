@@ -11,6 +11,8 @@
     inputs.self.nixosModules.base
     inputs.self.nixosModules.default
     inputs.self.nixosModules.microvm
+
+    ./logging.nix
   ];
   mymodules = {
     base = {
@@ -39,6 +41,10 @@
 
   networking = {
     useDHCP = false;
+    defaultGateway = {
+      address = "10.1.1.1";
+      interface = "enp0s2";
+    };
     interfaces = {
       # Handle the VLANs
       wan.useDHCP = true;
@@ -57,6 +63,7 @@
     pkgs.tmux
     pkgs.iperf3
     pkgs.nload
+    pkgs.htop
   ];
   networking.firewall.enable = lib.mkForce false;
 

@@ -83,6 +83,7 @@ in
             assertion = builtins.elem rootFsType [
               "tmpfs"
               "zfs"
+              # "ext4" # For build-vm
             ];
             message = ''
               root fsType '${config.fileSystems."/".fsType}' not supported by 'mymodules.base.persistence'
