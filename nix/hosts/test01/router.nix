@@ -85,14 +85,15 @@
             ip protocol { tcp, udp } flow offload @f
 
             # Drop packets with private IP addresses (RFC 1918) going to WAN from any interface
-            oifname "wan" ip saddr {
+            oifname "wan" ip daddr {
               10.0.0.0/8,
               172.16.0.0/12,
               192.168.0.0/16
             } drop comment "Block private IPv4 ranges from WAN"
 
             # Drop IPv6 ULA (Unique Local Address) range going to WAN from any interface
-            oifname "wan" ip6 saddr fc00::/7 drop comment "Block private IPv6 ranges from WAN"
+            oifname "wan" ip6 daddr fc00::/7 drop comment "Block private IPv6 ranges from WAN"
+
 
             iifname { "lan" } oifname { "wan" } accept comment "Allow trusted LAN to WAN"
             iifname { "wan" } oifname { "lan" } ct state { established, related } accept comment "Allow established back to LANs"
