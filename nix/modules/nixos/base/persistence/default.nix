@@ -2,6 +2,7 @@
   inputs,
   config,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -135,18 +136,38 @@ in
       })
 
       (mkIf (rootFsType == "zfs") {
-        boot.initrd.postResumeCommands = lib.mkAfter (
+        boot.initrd =
           let
             rootDataSet = config.fileSystems."/".device;
+            rollbackScript = ''
+              zfs list -Ht snapshot  ${rootDataSet}@lastboot > /dev/null 2>&1 && zfs destroy ${rootDataSet}@lastboot
+              zfs snapshot ${rootDataSet}@lastboot
+              zfs rollback -r ${rootDataSet}@blank && echo "rollback complete"
+            '';
           in
-          ''
-            echo "rolling back \"/\" to a clean state"
-            zfs destroy ${rootDataSet}@lastboot
-            zfs snapshot ${rootDataSet}@lastboot
-            zfs rollback -r ${rootDataSet}@blank
-          ''
-        );
+          {
+            postResumeCommands = lib.mkIf (!config.boot.initrd.systemd.enable) (lib.mkAfter rollbackScript);
 
+            systemd.services.rollback = lib.mkIf config.boot.initrd.systemd.enable {
+              description = "Rollback ZFS datasets to a pristine state";
+              wantedBy = [
+                "initrd.target"
+              ];
+              after = [
+                "zfs-import-zroot.service"
+              ];
+              before = [
+                "sysroot.mount"
+              ];
+              path = with pkgs; [
+                zfs
+              ];
+              unitConfig.DefaultDependencies = "no";
+              serviceConfig.Type = "oneshot";
+              script = rollbackScript;
+
+            };
+          };
       })
     ]
 

@@ -2,6 +2,7 @@
   lib,
   config,
   inputs,
+  pkgs,
   ...
 }:
 {
@@ -113,30 +114,47 @@
   networking = {
     hostName = "server01";
     inherit (config.mm.b.secrets.host.extra) hostId;
+    useNetworkd = true;
+  };
 
-    useDHCP = false;
-    vlans = {
-      wan = {
-        id = 10;
-        interface = "enp1s0";
+  systemd.network = {
+    enable = true;
+    netdevs = {
+      "20-wan" = {
+        netdevConfig = {
+          Kind = "vlan";
+          Name = "wan";
+        };
+        vlanConfig.Id = 10;
       };
-      lan = {
-        id = 20;
-        interface = "enp1s0";
+      "20-lan" = {
+        netdevConfig = {
+          Kind = "vlan";
+          Name = "lan";
+        };
+        vlanConfig.Id = 20;
       };
     };
-
-    interfaces = {
-      # Handle the VLANs
-      wan.useDHCP = true;
-      # lan = {
-      #   ipv4.addresses = [
-      #     {
-      #       address = "10.1.1.10";
-      #       prefixLength = 24;
-      #     }
-      #   ];
-      # };
+    networks = {
+      "30-enp1s0" = {
+        matchConfig.Name = "enp1s0";
+        vlan = [
+          "wan"
+          "lan"
+        ];
+      };
+      "40-wan" = {
+        matchConfig.Name = "wan";
+        networkConfig = {
+          DHCP = "ipv4";
+        };
+      };
+      "40-lan" = {
+        matchConfig.Name = "lan";
+        address = [
+          "10.1.1.10/24"
+        ];
+      };
     };
   };
 
@@ -160,6 +178,11 @@
   };
 
   boot = {
+    kernelParams = [
+      # Start debug shell on tty9
+      # "rd.systemd.debug_shell"
+    ];
+
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
@@ -167,14 +190,53 @@
 
     zfs.requestEncryptionCredentials = [ "zroot" ];
     initrd = {
-      availableKernelModules = [ "r8169" ];
+      availableKernelModules = [
+        "r8169"
+        "8021q"
+      ];
+      systemd = {
+        initrdBin = with pkgs; [
+          iproute2
+          iputils
+        ];
+        enable = true;
+        network = {
+          netdevs = {
+            "20-lan" = {
+              netdevConfig = {
+                Kind = "vlan";
+                Name = "lan";
+              };
+              vlanConfig.Id = 20;
+            };
+          };
+          networks = {
+            "30-enp1s0" = {
+              matchConfig.Name = "enp1s0";
+              vlan = [
+                "lan"
+              ];
+            };
+            "40-lan" = {
+              matchConfig.Name = "lan";
+              address = [
+                "10.1.1.10/24"
+              ];
+              linkConfig.RequiredForOnline = "yes";
+            };
+          };
+        };
+      };
       network = {
         enable = true;
         # TODO: only setup interface enp1so
-        udhcpc.extraArgs = [
-          "--background"
-          "&"
-        ];
+        udhcpc = lib.mkIf (!config.boot.initrd.systemd.enable) {
+          enable = false; # Has absolutly no effect
+          extraArgs = [
+            "--background"
+            "&"
+          ];
+        };
         ssh = {
           enable = true;
           port = 22;
