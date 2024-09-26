@@ -23,6 +23,14 @@
     };
     services = {
       openssh.enable = true;
+      prometheus.exporters.scrapeHost = "10.1.1.1";
+    };
+    monitoring.enable = true;
+    microvm.guest = {
+      # mem = 256;
+      # NOTE: network interfaces not setup when memory ballooning is enabled
+      # TODO: test why this is
+      balloonMem = 0;
     };
   };
 
@@ -61,23 +69,4 @@
 
   networking.hostName = "test01";
   system.stateVersion = "24.11";
-
-  services.prometheus = {
-    exporters = {
-      node = {
-        enable = true;
-        extraFlags = [
-          "--collector.filesystem.mount-points-exclude=^/(nix/store)($|/)"
-        ];
-        enabledCollectors = [
-          "logind"
-          "processes"
-          "systemd"
-          "interrupts"
-          "tcpstat"
-        ];
-        port = 9002;
-      };
-    };
-  };
 }

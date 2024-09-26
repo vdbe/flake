@@ -62,8 +62,6 @@
               autostart = true;
               modules = [
                 {
-                  services.openssh.settings.PasswordAuthentication = lib.mkForce true;
-
                   mymodules = {
                     microvm.guest = {
                       interfaces.lan = {
@@ -83,13 +81,6 @@
               autostart = true;
               modules = [
                 {
-                  services.openssh = {
-                    settings = {
-                      PermitRootLogin = lib.mkForce "yes";
-                      PasswordAuthentication = lib.mkForce true;
-                    };
-                  };
-
                   mymodules = {
                     microvm.guest = {
                       interfaces.lan = {
@@ -122,15 +113,15 @@
     netdevs = {
       "20-wan" = {
         netdevConfig = {
-          Kind = "vlan";
           Name = "wan";
+          Kind = "vlan";
         };
         vlanConfig.Id = 10;
       };
       "20-lan" = {
         netdevConfig = {
-          Kind = "vlan";
           Name = "lan";
+          Kind = "vlan";
         };
         vlanConfig.Id = 20;
       };
@@ -148,12 +139,6 @@
         networkConfig = {
           DHCP = "ipv4";
         };
-      };
-      "40-lan" = {
-        matchConfig.Name = "lan";
-        address = [
-          "10.1.1.10/24"
-        ];
       };
     };
   };

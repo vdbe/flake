@@ -1,6 +1,6 @@
 { config, lib, ... }:
 let
-  inherit (lib.modules) mkIf;
+  inherit (lib.modules) mkIf mkDefault;
   inherit (lib.options) literalExpression mkEnableOption;
 
   cfg = config.mymodules.base.nix.nixpkgs;
@@ -18,13 +18,13 @@ in
       # set up garbage collection to run daily, and removing packages after 3
       # days
       gc = {
-        automatic = true;
+        automatic = mkDefault true;
         options = "--delete-older-than 3d";
       };
 
       # automatically optimize /nix/store by removing hard links
       optimise = {
-        automatic = true;
+        automatic = mkDefault true;
         # dates = [];
       };
 

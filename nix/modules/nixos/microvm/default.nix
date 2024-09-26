@@ -138,6 +138,11 @@ in
         type = types.listOf types.str;
         default = [ ];
       };
+      vcpu = mkOption {
+        description = "Number of virtual CPU cores";
+        default = 2;
+        type = types.int;
+      };
       mountBase = mkOption {
         description = "Location (ZFS dataset, ...) where all the shares live.";
         type = types.path;
@@ -147,6 +152,31 @@ in
       interfaces = mkOption {
         type = types.attrsOf (types.submodule interfaceOpts);
         default = { };
+      };
+      mem = mkOption {
+        description = "Amount of RAM in megabytes";
+        default = 512;
+        type = types.int;
+      };
+
+      balloonMem = mkOption {
+        description = ''
+          Amount of balloon memory in megabytes
+
+          The way virtio-balloon works is that this is the memory size
+          that the host can request to be freed by the VM. Initial
+          booting of the VM allocates mem+balloonMem megabytes of RAM.
+        '';
+        default = 0;
+        type = types.int;
+      };
+      hugepageMem = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Whether to use hugepages as memory backend.
+          (Currently only respected if using cloud-hypervisor)
+        '';
       };
     };
   };
