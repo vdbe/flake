@@ -23,6 +23,12 @@
     };
     services = {
       openssh.enable = true;
+      prometheus.exporters.scrapeHost = "10.1.1.22";
+    };
+    monitoring.enable = true;
+    microvm.guest = {
+      # mem = 256;
+      balloonMem = 1024;
     };
   };
 
@@ -43,12 +49,12 @@
     useDHCP = false;
     defaultGateway = {
       address = "10.1.1.1";
-      interface = "enp0s2";
+      # interface = "enp0s2";
+      interface = "enp0s5";
     };
     interfaces = {
-      # Handle the VLANs
-      wan.useDHCP = true;
-      enp0s2 = {
+      # enp0s2 = {
+      enp0s5 = {
         ipv4.addresses = [
           {
             address = "10.1.1.22";

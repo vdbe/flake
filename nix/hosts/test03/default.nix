@@ -21,9 +21,17 @@
     };
     services = {
       openssh.enable = true;
+      prometheus.exporters.scrapeHost = "10.1.1.23";
+    };
+    monitoring.enable = true;
+    microvm.guest = {
+      # mem = 256;
+      balloonMem = 1024;
+      hugepageMem = true;
     };
   };
 
+  # services.qemuGuest.enable = true;
   sops.secrets.hashed_password.neededForUsers = true;
   users = {
     users = {
@@ -78,24 +86,4 @@
 
   networking.hostName = "test03";
   system.stateVersion = "24.11";
-
-  services.prometheus = {
-    exporters = {
-      node = {
-        enable = true;
-        extraFlags = [
-          "--collector.filesystem.mount-points-exclude=^/(nix/store)($|/)"
-        ];
-        enabledCollectors = [
-          "logind"
-          "processes"
-          "systemd"
-          "interrupts"
-          "tcpstat"
-          "lnstat"
-        ];
-        port = 9002;
-      };
-    };
-  };
 }

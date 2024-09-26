@@ -1,12 +1,26 @@
 { config, ... }:
 {
+  mymodules.services.prometheus = {
+    enable = true;
+    parseFlake = true;
+  };
+
   # grafana configuration
   services.grafana = {
     enable = true;
-    settings.server = {
-      domain = "grafana.home.arpa";
-      http_addr = "127.0.0.1";
-      http_port = 3000;
+    settings = {
+      server = {
+        domain = "grafana.home.arpa";
+        http_addr = "127.0.0.1";
+        http_port = 3000;
+      };
+      analytics = {
+        reporting_enabled = false;
+        check_for_updates = false;
+      };
+      users = {
+        allow_signup = false;
+      };
     };
     provision.datasources.settings = {
       apiVersion = 1;
@@ -15,7 +29,10 @@
         {
           name = "prometheus";
           type = "prometheus";
-          url = "http://localhost:9001";
+          url = "http://localhost:${toString config.services.prometheus.port}";
+          jsonData = {
+            timeInterval = "1m";
+          };
         }
       ];
     };
@@ -32,42 +49,4 @@
       };
     };
   };
-
-  services.prometheus = {
-    enable = true;
-    port = 9001;
-
-    scrapeConfigs = [
-      {
-        job_name = "node";
-        static_configs = [
-          {
-            targets = [
-              "127.0.0.1:${toString config.services.prometheus.exporters.node.port}"
-              "10.1.1.1:${toString config.services.prometheus.exporters.node.port}"
-              "10.1.1.23:${toString config.services.prometheus.exporters.node.port}"
-            ];
-          }
-        ];
-      }
-    ];
-
-    exporters = {
-      node = {
-        enable = true;
-        extraFlags = [
-          "--collector.filesystem.mount-points-exclude=^/(nix/store)($|/)"
-        ];
-        enabledCollectors = [
-          "logind"
-          "processes"
-          "systemd"
-          "interrupts"
-          "tcpstat"
-        ];
-        port = 9002;
-      };
-    };
-  };
-
 }

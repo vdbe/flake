@@ -21,13 +21,15 @@
     vlans = {
       wan = {
         id = 10;
-        interface = "enp0s6";
+        # interface = "enp0s6";
         # interface = "enp0s7";
+        interface = "enp0s4f0";
       };
       lan = {
         id = 20;
-        interface = "enp0s6";
+        # interface = "enp0s6";
         # interface = "enp0s7";
+        interface = "enp0s4f0";
       };
     };
 
@@ -42,14 +44,14 @@
           }
         ];
       };
-      enp0s2 = {
-        ipv4.addresses = [
-          {
-            address = "10.1.1.30";
-            prefixLength = 24;
-          }
-        ];
-      };
+      # enp0s2 = {
+      #   ipv4.addresses = [
+      #     {
+      #       address = "10.1.1.30";
+      #       prefixLength = 24;
+      #     }
+      #   ];
+      # };
     };
 
     # No local firewall.
@@ -63,7 +65,7 @@
           # enable flow offloading for better throughput
           flowtable f {
             hook ingress priority 0;
-            devices = { enp0s6 };
+            devices = { enp0s4f0 };
           }
 
           chain input {

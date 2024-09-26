@@ -25,10 +25,20 @@ in
       #   loader.systemd-boot.enable = true;
       # };
       #
+
+      # Can't optimise/gc read only store
+      nix = {
+        optimise.automatic = false;
+        gc.automatic = false;
+      };
       microvm = {
-        hypervisor = lib.mkDefault "cloud-hypervisor";
-        mem = lib.mkDefault 512;
-        vcpu = lib.mkDefault 4;
+        # hypervisor = mkDefault "cloud-hypervisor"; # Has some memory balooning issues 
+        hypervisor = mkDefault "qemu";
+
+        mem = mkDefault cfg.mem;
+        vcpu = mkDefault cfg.vcpu;
+        balloonMem = mkDefault cfg.balloonMem;
+        hugepageMem = mkDefault cfg.hugepageMem;
 
         interfaces = builtins.attrValues (
           mapAttrs (_: interface: {
