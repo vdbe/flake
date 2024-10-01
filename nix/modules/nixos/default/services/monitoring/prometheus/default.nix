@@ -1,8 +1,6 @@
 {
-  self,
   config,
   lib,
-  inputs,
   ...
 }:
 let
@@ -14,12 +12,6 @@ let
   inherit (lib.options) mkEnableOption;
 
   inherit (lib.trivial) warn;
-
-  inherit (inputs.self) nixosConfigurations;
-
-  monitoringEnabledNixosConfigurations = filterAttrs (
-    _: v: v.config.mymodules.monitoring.enable or false
-  ) nixosConfigurations;
 
   exporterToTarget =
     host: exporter:
@@ -39,7 +31,7 @@ let
       defaulting to `${name}`" name);
 
       labels = {
-        alias = name;
+        alias = config'.mymodules.monitoring.alias or name;
       };
 
       exporterToTarget' = exporterToTarget host;
@@ -68,7 +60,7 @@ let
   scrapeConfigs =
     let
       namedScrapeConfigs = zipAttrsWith (_: flatten) (
-        mapAttrsToList nixosConfigurationToNamedStaticConfigs monitoringEnabledNixosConfigurations
+        mapAttrsToList nixosConfigurationToNamedStaticConfigs config.mymodules.monitoring.monitoringEnabledNixosConfigurations
       );
     in
     mapAttrsToList (job_name: static_configs: {
@@ -95,6 +87,27 @@ in
     services.prometheus = {
       enable = true;
       inherit scrapeConfigs;
+    };
+
+    # NOTE: Are multuple PR's open to create parent directories
+    systemd.tmpfiles.rules = lib.mkIf config.mymodules.persistence.enable [
+      "d ${
+        config.environment.persistence."data/monitoring/prometheus".persistentStoragePath
+      }/var/lib/${config.services.prometheus.stateDir} 0755 prometheus prometheus"
+    ];
+    mymodules.base.persistence.categories."data/monitoring/prometheus" = {
+      directories =
+        let
+          user = "prometheus";
+          inherit (config.users.users.${user}) group;
+        in
+        [
+          {
+            inherit user group;
+            directory = "/var/lib/${config.services.prometheus.stateDir}";
+            mode = "700";
+          }
+        ];
     };
   };
 }

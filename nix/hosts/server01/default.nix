@@ -216,7 +216,7 @@
         enable = true;
         # TODO: only setup interface enp1so
         udhcpc = lib.mkIf (!config.boot.initrd.systemd.enable) {
-          enable = false; # Has absolutly no effect
+          enable = false; # Has absolutely no effect
           extraArgs = [
             "--background"
             "&"

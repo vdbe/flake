@@ -12,7 +12,6 @@
           inputsFrom = [ config.treefmt.build.devShell ];
           packages =
             (with pkgs; [
-
               # nix: lsp
               nixd
 

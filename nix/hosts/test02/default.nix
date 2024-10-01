@@ -23,9 +23,12 @@
     };
     services = {
       openssh.enable = true;
-      prometheus.exporters.scrapeHost = "10.1.1.22";
+      promtail.parseFlake = true;
     };
-    monitoring.enable = true;
+    monitoring = {
+      enable = true;
+      reachableAt = "10.1.1.22";
+    };
     microvm.guest = {
       # mem = 256;
       balloonMem = 1024;

@@ -5,7 +5,7 @@ let
   inherit (lib.modules) mkIf mkDefault;
   inherit (lib.options) mkOption mkEnableOption;
 
-  isVm = (config.mymodules.microvm.guest.enable or false);
+  isVm = config.mymodules.microvm.guest.enable or false;
 
   cfg = config.mymodules.services.prometheus.exporters;
 in
@@ -14,7 +14,7 @@ in
     enable = mkEnableOption "prometheus exporters";
     scrapeHost = mkOption {
       type = types.nullOr types.str;
-      default = null;
+      default = config.mymodules.monitoring.reachableAt;
       description = "host/ip this machine is reachable to scrape the exporters";
     };
     node = {
