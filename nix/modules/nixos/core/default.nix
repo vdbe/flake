@@ -1,4 +1,9 @@
-{ lib, ... }:
+{
+  lib,
+  inputs,
+  pkgs,
+  ...
+}:
 let
   inherit (lib) types;
   inherit (lib.modules) mkAliasOptionModule mkDefault;
@@ -13,6 +18,8 @@ let
     "microvm-guest"
   ];
 
+  mkPkgsArgs = input: inputs.${input}.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+
 in
 {
   options.mymodules = {
@@ -26,6 +33,12 @@ in
   imports = [ (mkAliasOptionModule [ "mm" ] [ "mymodules" ]) ];
 
   config = {
+    _module.args = {
+      pkgs-stable = mkPkgsArgs "nixpkgs-stable";
+      pkgs-unstable = mkPkgsArgs "nixpkgs-unstable";
+      pkgs-my = mkPkgsArgs "mypkgs";
+    };
+
     mymodules = {
       importedModules = mkDefault [ "core" ];
     };

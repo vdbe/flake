@@ -1,13 +1,20 @@
-{ config, ... }:
+{ config, pkgs-my, ... }:
 {
-  mymodules.services.prometheus = {
-    enable = true;
-    parseFlake = true;
+  mymodules.services = {
+    loki = {
+      enable = true;
+      defaultPromtailClient = true;
+    };
+    prometheus = {
+      enable = true;
+      parseFlake = true;
+    };
   };
 
   # grafana configuration
   services.grafana = {
     enable = true;
+    declarativePlugins = with pkgs-my.grafanaPlugins; [ grafana-lokiexplore-app ];
     settings = {
       server = {
         domain = "grafana.home.arpa";
@@ -22,19 +29,29 @@
         allow_signup = false;
       };
     };
-    provision.datasources.settings = {
-      apiVersion = 1;
 
-      datasources = [
-        {
-          name = "prometheus";
-          type = "prometheus";
-          url = "http://localhost:${toString config.services.prometheus.port}";
-          jsonData = {
-            timeInterval = "1m";
-          };
-        }
-      ];
+    provision = {
+      enable = true;
+
+      datasources.settings = {
+        datasources = [
+          {
+            name = "Prometheus";
+            type = "prometheus";
+            url = "http://localhost:${toString config.services.prometheus.port}";
+            jsonData = {
+              timeInterval = "1m";
+            };
+          }
+          {
+            name = "Loki";
+            type = "loki";
+            access = "proxy";
+            url = "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}";
+          }
+        ];
+      };
+
     };
   };
 

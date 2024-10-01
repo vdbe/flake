@@ -1,6 +1,19 @@
 {
   description = "A very basic flake";
 
+  nixConfig = {
+    extra-substituters = [
+      "https://vdbe.cachix.org"
+      "https://microvm.cachix.org"
+      "https://cache.thalheim.io"
+    ];
+    extra-trusted-public-keys = [
+      "vdbe.cachix.org-1:ID9DIbnE6jHyJlQiwS7L7tFULJd1dsxt2ODAWE94nts="
+      "microvm.cachix.org-1:oXnBc6hRE3eX5rSYdRyMYXnfzcCxC7yKPTbZXALsqys="
+      "cache.thalheim.io-1:R7msbosLEZKrxk/lKxf9BTjOOH7Ax3H0Qj0/6wiHOgc="
+    ];
+  };
+
   inputs = {
     # supported systems
     systems.url = "github:nix-systems/default";
@@ -9,6 +22,11 @@
     nixpkgs.follows = "nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    mypkgs = {
+      url = "github:vdbe/flake-pkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # terraform
     terranix = {
