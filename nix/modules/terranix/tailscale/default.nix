@@ -3,7 +3,7 @@ let
   inherit (builtins) attrValues mapAttrs toJSON;
   inherit (lib) types tf;
   inherit (lib.attrsets) genAttrs;
-  inherit (lib.modules) mkDefault;
+  inherit (lib.modules) mkDefault mkIf;
   inherit (lib.options) mkOption;
 
   coercedListOf = t: types.coercedTo t (v: [ v ]) (types.listOf t);
@@ -136,16 +136,16 @@ in
     tailnet = mkOption { type = types.str; };
 
     tags = mkOption {
-      type = types.submodule tagsOpt;
-      default = { };
+      type = types.nullOr (types.submodule tagsOpt);
+      default = null;
     };
     devices = mkOption {
-      type = types.attrsOf (types.submodule deviceOpts);
-      default = { };
+      type = types.nullOr (types.attrsOf (types.submodule deviceOpts));
+      default = null;
     };
     acl = mkOption {
-      type = types.submodule aclOpts;
-      default = { };
+      type = types.nullOr (types.submodule aclOpts);
+      default = null;
     };
   };
 
@@ -153,24 +153,36 @@ in
     terraform.required_providers = {
       tailscale.source = "registry.terraform.io/tailscale/tailscale";
     };
+
     provider.tailscale = {
       inherit (cfg) tailnet;
     };
 
+    import = mkIf (cfg.acl != null) [
+      {
+        to = "tailscale_acl.default";
+        id = "acl";
+      }
+    ];
+
     data = {
-      tailscale_device = mapAttrs (_: device: {
-        inherit (device) name;
-        wait_for = "60s";
-      }) cfg.devices;
+      tailscale_device = mkIf (cfg.devices != null) (
+        mapAttrs (_: device: {
+          inherit (device) name;
+          wait_for = "60s";
+        }) cfg.devices
+      );
     };
 
     resource = {
-      tailscale_device_tags = mapAttrs (_: device: {
-        inherit (device) tags;
-        device_id = device.id;
-      }) cfg.devices;
+      tailscale_device_tags = mkIf (cfg.acl != null) (
+        mapAttrs (_: device: {
+          inherit (device) tags;
+          device_id = device.id;
+        }) cfg.devices
+      );
 
-      tailscale_acl = {
+      tailscale_acl = mkIf (cfg.acl != null) {
         default = {
           acl = toJSON cfg.acl;
         };

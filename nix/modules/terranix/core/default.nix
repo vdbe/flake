@@ -12,7 +12,10 @@ in
       type = types.nullOr types.path;
       default = null;
     };
-    dataSecretsYaml = mkOption { type = types.str; };
+    dataSecretsYaml = mkOption {
+      type = types.str;
+      default = "data.sops_file.secrets.data";
+    };
   };
   config = mkIf (cfg.sopsFile != null) {
     terraform.required_providers = {
@@ -24,6 +27,5 @@ in
         secrets = mkDefault { source_file = builtins.toString cfg.sopsFile; };
       };
     };
-    mymodules.dataSecretsYaml = mkDefault "data.sops_file.secrets.data";
   };
 }
