@@ -16,6 +16,7 @@ in
       type = types.str;
       default = "data.sops_file.secrets.data";
     };
+    nestedImports = lib.options.mkEnableOption "Import and apply nested resources";
   };
   config = mkIf (cfg.sopsFile != null) {
     terraform.required_providers = {

@@ -4,13 +4,18 @@ let
 in
 {
   perSystem =
-    { pkgs, system, ... }:
+    {
+      pkgs,
+      system,
+      ...
+    }:
     {
       packages = {
         opentofu = pkgs.opentofu.withPlugins (
           plugins: with plugins; [
-            tailscale
+            github
             sops
+            tailscale
           ]
         );
 
@@ -21,8 +26,12 @@ in
           };
           modules = [
             inputs.self.terranixModules.core
-            ./tailscale
+            ./github
             ./secrets.nix
+            ./tailscale
+            {
+              mymodules.nestedImports = true;
+            }
           ];
         };
       };

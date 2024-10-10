@@ -7,6 +7,7 @@ let
 in
 flake-parts.lib.mkFlake { inherit inputs; } {
   systems = import systems;
+  debug = true;
 
   flake.inputs = inputs;
 
