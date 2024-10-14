@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1728334376,
-        "narHash": "sha256-CTKEKPzD/j8FK6H4DO3EjyixZd3HHvgAgfnCwpGFP5c=",
+        "lastModified": 1728763831,
+        "narHash": "sha256-KOp33tls7jRAhcmu77aVxKpSMou8QgK0BC+Y3sYLuGo=",
         "owner": "nix-community",
         "repo": "disko",
-        "rev": "d39ee334984fcdae6244f5a8e6ab857479cbaefe",
+        "rev": "b6215392ec3bd05e9ebfbb2f7945c414096fce8f",
         "type": "github"
       },
       "original": {
@@ -128,11 +128,11 @@
         "spectrum": []
       },
       "locked": {
-        "lastModified": 1728349983,
-        "narHash": "sha256-VRQm46/W29z87IeITfvxIrS6LUEItgDtEDzqVX59q0E=",
+        "lastModified": 1728779945,
+        "narHash": "sha256-RFKyZygnUbJlWq1uBn4JvEEcQKZW3AFBL3bQoywECPI=",
         "owner": "astro",
         "repo": "microvm.nix",
-        "rev": "470537e671d743f40812b9c071a4130eabdb3deb",
+        "rev": "4d81c4115ef832880561f243efec21f06d2a8b7c",
         "type": "github"
       },
       "original": {
@@ -197,11 +197,11 @@
     },
     "nixpkgs-stable": {
       "locked": {
-        "lastModified": 1728500571,
-        "narHash": "sha256-dOymOQ3AfNI4Z337yEwHGohrVQb4yPODCW9MDUyAc4w=",
+        "lastModified": 1728740863,
+        "narHash": "sha256-u+rxA79a0lyhG+u+oPBRtTDtzz8kvkc9a6SWSt9ekVc=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "d51c28603def282a24fa034bcb007e2bcb5b5dd0",
+        "rev": "a3f9ad65a0bf298ed5847629a57808b97e6e8077",
         "type": "github"
       },
       "original": {
@@ -332,16 +332,16 @@
         "terranix-examples": []
       },
       "locked": {
-        "lastModified": 1727872849,
+        "lastModified": 1728896276,
         "narHash": "sha256-+vve5uxxT45RHNg+yXxIoqXeBr0BygSeQ+peHCoyP/c=",
-        "owner": "vdbe",
+        "owner": "terranix",
         "repo": "terranix",
-        "rev": "44737c01d03edef78fe216b25ed7e64e76fdc432",
+        "rev": "5b57c317342dc6972639be13f6a4919b93af5a0b",
         "type": "github"
       },
       "original": {
-        "owner": "vdbe",
-        "ref": "dev",
+        "owner": "terranix",
+        "ref": "develop",
         "repo": "terranix",
         "type": "github"
       }
