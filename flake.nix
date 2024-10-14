@@ -30,8 +30,8 @@
 
     # terraform
     terranix = {
-      # url = "github:terranix/terranix";
-      url = "github:vdbe/terranix?ref=dev";
+      url = "github:terranix/terranix/develop";
+      # url = "github:vdbe/terranix/dev";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-utils.follows = "flake-utils";
