@@ -7,6 +7,8 @@ let
 
   isVm = config.mymodules.microvm.guest.enable or false;
 
+  prometheusExporters = config.services.prometheus.exporters;
+
   cfg = config.mymodules.services.prometheus.exporters;
 in
 {
@@ -22,9 +24,14 @@ in
         default = true;
       };
     };
+    portsUsed = mkOption {
+      type = types.listOf types.number;
+      default = [ ];
+    };
   };
 
   config = mkIf cfg.enable {
+    mymodules.services.prometheus.exporters.portsUsed = lists.optional prometheusExporters.node.enable prometheusExporters.node.port;
     services.prometheus.exporters = {
       node = {
         enable = mkDefault cfg.node.enable;

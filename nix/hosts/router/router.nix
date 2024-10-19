@@ -1,4 +1,9 @@
-{ pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   # false -> NIC: eth0 *
   # true -> NIC: enp0s6/ens6
@@ -7,6 +12,7 @@
   boot.kernel = {
     sysctl = {
       "net.ipv4.conf.all.forwarding" = true;
+      # TODO: Check ipv6
       "net.ipv6.conf.all.forwarding" = false;
 
       # TODO: Validate these options
@@ -56,12 +62,22 @@
 
     # No local firewall.
     nat.enable = false;
-    firewall.enable = false;
+    firewall.enable = lib.mkForce false;
 
     nftables = {
       enable = true;
       ruleset = ''
         table inet filter {
+          set monitoring-ports {
+            type inet_service;
+            elements = { ${builtins.concatStringsSep ", " (builtins.map builtins.toString config.mymodules.services.prometheus.exporters.portsUsed)} };
+          }
+
+          set ssh-ports {
+            type inet_service;
+            elements = { ${builtins.concatStringsSep ", " (builtins.map builtins.toString config.services.openssh.ports)} };
+          }
+
           # enable flow offloading for better throughput
           flowtable f {
             hook ingress priority 0;
@@ -71,7 +87,9 @@
           chain input {
             type filter hook input priority 0; policy drop;
 
-            iifname { "lan" } accept comment "Allow local network to access the router"
+            # iifname { "lan" } accept comment "Allow local network to access the router"
+            iifname { "lan" } tcp dport @monitoring-ports accept comment "Allow TCP monitoring ports on LAN"
+            iifname { "lan" } tcp dport @ssh-ports accept comment "Allow SSH access from LAN"
 
             iifname "wan" ct state { established, related } accept comment "Allow established traffic"
             iifname "wan" icmp type { echo-request, destination-unreachable, time-exceeded } counter accept comment "Allow select ICMP"

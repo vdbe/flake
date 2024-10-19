@@ -58,9 +58,11 @@ in
           # this a really nice feature to have
           "auto-allocate-uids"
 
+          # NOTE: No longer experimental on unstable
+          #
           # allow passing installables to nix repl, making its interface
           # consistent with the other experimental commands
-          "repl-flake"
+          # "repl-flake"
 
           # disallow unquoted URLs as part of the Nix language syntax this are
           # explicitly derpricated and are unused in nixpkgs, so we should

@@ -6,9 +6,11 @@ let
 
   nixosConfigurations = {
     server01 = ./server01;
-    test01 = ./test01;
-    test02 = ./test02;
-    test03 = ./test03;
+    arnold = ./arnold;
+    bastion = ./bastion;
+    router = ./router;
+    # test02 = ./test02;
+    # test03 = ./test03;
   };
 
   unevaluatedNixosConfigurations = mapAttrs (_: path: {

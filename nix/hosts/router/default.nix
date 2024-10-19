@@ -68,8 +68,7 @@
     pkgs.nload
     pkgs.htop
   ];
-  networking.firewall.enable = lib.mkForce false;
 
-  networking.hostName = "test01";
+  networking.hostName = "router";
   system.stateVersion = "24.11";
 }

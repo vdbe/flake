@@ -30,6 +30,7 @@ in
       "personal"
       "phone"
       "server"
+      "bastion"
     ];
     devices = {
       buckbeak = {
@@ -51,6 +52,12 @@ in
         ];
       };
       server01 = {
+        tags = tags.server;
+      };
+      arnold = {
+        tags = tags.server;
+      };
+      bastion = {
         tags = tags.server;
       };
     };

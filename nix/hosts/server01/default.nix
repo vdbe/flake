@@ -26,7 +26,15 @@
     };
     services = {
       openssh.enable = true;
-      tailscale.enable = false;
+      tailscale = {
+        enable = true;
+        sopsAuthKey = "tailscale/auth_key";
+      };
+      promtail.parseFlake = true;
+    };
+    monitoring = {
+      enable = true;
+      reachableAt = "10.1.1.10";
     };
 
     microvm = {
@@ -36,14 +44,15 @@
         vms = lib.mkMerge [
           {
             inherit (inputs.self.unevaluatedNixosConfigurations)
-              test01
-              test02
-              test03
+              router
+              bastion
+              # test02
+              # test03
               ;
           }
           {
             # host specific overrides for guests
-            test01 = {
+            router = {
               autostart = true;
               modules = [
                 {
@@ -58,26 +67,7 @@
                 }
               ];
             };
-            test02 = {
-              autostart = true;
-              modules = [
-                {
-                  mymodules = {
-                    microvm.guest = {
-                      interfaces.lan = {
-                        type = "macvtap";
-
-                        macvtap = {
-                          link = "lan";
-                          mode = "bridge";
-                        };
-                      };
-                    };
-                  };
-                }
-              ];
-            };
-            test03 = {
+            bastion = {
               autostart = true;
               modules = [
                 {
@@ -130,15 +120,17 @@
       "30-enp1s0" = {
         matchConfig.Name = "enp1s0";
         vlan = [
-          "wan"
+          # "wan"
           "lan"
         ];
       };
-      "40-wan" = {
-        matchConfig.Name = "wan";
-        networkConfig = {
-          DHCP = "ipv4";
-        };
+      "40-lan" = {
+        matchConfig.Name = "lan";
+        gateway = [ "10.1.1.1" ];
+        address = [
+          "10.1.1.10/24"
+        ];
+        linkConfig.RequiredForOnline = "yes";
       };
     };
   };
@@ -161,11 +153,10 @@
   sops.secrets.initrd_host_key = {
     key = "initrd/ssh_host_ed25519_key";
   };
-
   boot = {
     kernelParams = [
       # Start debug shell on tty9
-      # "rd.systemd.debug_shell"
+      "rd.systemd.debug_shell"
     ];
 
     loader = {
@@ -204,6 +195,7 @@
             };
             "40-lan" = {
               matchConfig.Name = "lan";
+              gateway = [ "10.1.1.1" ];
               address = [
                 "10.1.1.10/24"
               ];
@@ -211,6 +203,9 @@
             };
           };
         };
+      };
+      secrets = {
+        "/etc/secrets/initrd/ssh_host_key" = config.sops.secrets.initrd_host_key.path;
       };
       network = {
         enable = true;
@@ -226,7 +221,11 @@
           enable = true;
           port = 22;
           authorizedKeys = config.secrets.extra.hostKeys.admin;
-          hostKeys = [ config.sops.secrets.initrd_host_key.path ];
+          # hostKeys = [ config.sops.templates.initrd_host_key.path ];
+          ignoreEmptyHostKeys = true;
+          extraConfig = ''
+            hostKey /etc/secrets/initrd/ssh_host_key
+          '';
         };
       };
     };

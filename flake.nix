@@ -28,13 +28,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+
     # terraform
     terranix = {
       url = "github:terranix/terranix/develop";
       # url = "github:vdbe/terranix/dev";
       inputs = {
+        flake-parts.follows = "flake-parts";
         nixpkgs.follows = "nixpkgs";
-        flake-utils.follows = "flake-utils";
         terranix-examples.follows = "";
         bats-support.follows = "";
         bats-assert.follows = "";
@@ -71,7 +73,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # microvim
+    # microvm
     microvm = {
       url = "github:astro/microvm.nix";
       inputs = {
@@ -79,6 +81,12 @@
         flake-utils.follows = "flake-utils";
         spectrum.follows = "";
       };
+    };
+
+    # raspberry pi
+    raspberry-pi-nix = {
+      url = "github:nix-community/raspberry-pi-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # dev

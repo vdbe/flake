@@ -3,7 +3,7 @@
   mymodules.services = {
     loki = {
       enable = true;
-      defaultPromtailClient = true;
+      defaultPromtailClient = "falsekj:with";
     };
     prometheus = {
       enable = true;
