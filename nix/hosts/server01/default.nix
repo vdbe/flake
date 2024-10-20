@@ -96,6 +96,11 @@
     hostName = "server01";
     inherit (config.mm.b.secrets.host.extra) hostId;
     useNetworkd = true;
+    firewall = {
+      interfaces.lan = {
+        allowedTCPPorts = config.mymodules.services.prometheus.exporters.portsUsed;
+      };
+    };
   };
 
   systemd.network = {

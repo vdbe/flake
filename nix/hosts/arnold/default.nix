@@ -101,15 +101,7 @@
   networking = {
     firewall = {
       interfaces.end0 = {
-        allowedTCPPorts = lib.trivial.pipe config.services.prometheus.exporters [
-          (lib.attrsets.filterAttrs (
-            name: exporter: if name == "minio" then false else exporter.enable or false
-          ))
-          builtins.attrValues
-          (builtins.map (exporter: exporter.port))
-
-        ];
-
+        allowedTCPPorts = config.mymodules.services.prometheus.exporters.portsUsed;
       };
     };
   };

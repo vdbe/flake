@@ -1,5 +1,4 @@
-{ config, ... }:
-{
+_: {
   mymodules = {
     services = {
       tailscale = {
