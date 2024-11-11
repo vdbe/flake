@@ -72,7 +72,7 @@
           keylocation = "file:///tmp/secret.key";
 
           canmount = "off";
-          "com.sun:auto-snapshot" = "false";
+          "com.sun:auto-snapshot" = "off";
         };
         # -o
         options = {
@@ -84,88 +84,95 @@
         '';
 
         datasets = {
-          root = {
+          "local" = {
+            type = "zfs_fs";
+            options = {
+              canmount = "off";
+            };
+          };
+          "local/root" = {
             type = "zfs_fs";
             mountpoint = "/";
             options = {
-
-              "com.sun:auto-snapshot" = "false";
+              # atime = "off";
+              # compression = "zstd";
+              # "com.sun:auto-snapshot" = "off";
             };
             postCreateHook = ''
-              zfs snapshot zroot/root@blank
-              zfs snapshot zroot/root@lastboot
+              zfs snapshot zroot/local/root@blank
+              zfs snapshot zroot/local/root@lastboot
             '';
           };
-          home = {
+          "local/home" = {
             type = "zfs_fs";
             mountpoint = "/home";
             options = {
-
-              "com.sun:auto-snapshot" = "true";
+              "com.sun:auto-snapshot" = "on";
             };
           };
-          persist = {
+          "local/persist" = {
             type = "zfs_fs";
             mountpoint = "/persist";
-            options = {
-              "com.sun:auto-snapshot" = "off";
-            };
+            # options = {
+            #   # "com.sun:auto-snapshot" = "off";
+            # };
           };
-          "persist/state" = {
+          "local/persist/state" = {
             type = "zfs_fs";
             mountpoint = "/persist/state";
             options = {
               "com.sun:auto-snapshot" = "on";
             };
           };
-          "persist/data" = {
+          "local/persist/data" = {
             type = "zfs_fs";
             mountpoint = "/persist/data";
             options = {
               "com.sun:auto-snapshot" = "on";
             };
           };
-          "persist/cache" = {
+          "local/persist/cache" = {
             type = "zfs_fs";
             mountpoint = "/persist/cache";
-            options = {
-              "com.sun:auto-snapshot" = "on";
-            };
-            postCreateHook = "zfs snapshot zroot/persist/cache@blank";
+            # options = {
+            #   # "com.sun:auto-snapshot" = "on";
+            # };
+            postCreateHook = "zfs snapshot zroot/local/persist/cache@blank";
           };
-          microvms = {
-            options = {
-              canmount = "off";
-              "com.sun:auto-snapshot" = "false";
-            };
-            type = "zfs_fs";
-          };
-          nix = {
+          "local/microvms" = {
             options = {
               canmount = "off";
-              "com.sun:auto-snapshot" = "false";
+              # "com.sun:auto-snapshot" = "off";
             };
             type = "zfs_fs";
           };
-          "nix/var" = {
-            type = "zfs_fs";
-            mountpoint = "/nix/var";
+          "local/nix" = {
+            mountpoint = "/nix";
             options = {
-              "com.sun:auto-snapshot" = "false";
+              # canmount = "off";
+              # "com.sun:auto-snapshot" = "off";
             };
-          };
-          "nix/store" = {
             type = "zfs_fs";
-            mountpoint = "/nix/store";
-            options = {
-              "com.sun:auto-snapshot" = "false";
-            };
           };
+          # "nix/var" = {
+          #   type = "zfs_fs";
+          #   mountpoint = "/nix/var";
+          #   options = {
+          #     "com.sun:auto-snapshot" = "off";
+          #   };
+          # };
+          # "nix/store" = {
+          #   type = "zfs_fs";
+          #   mountpoint = "/nix/store";
+          #   options = {
+          #     "com.sun:auto-snapshot" = "false";
+          #   };
+          # };
           # zfs uses copy on write and requires some free space to delete files when the disk is completely filled
-          reserved = {
+          "local/reserved" = {
             options = {
-              canmount = "off";
               mountpoint = "none";
+              canmount = "off";
               reservation = "5GiB";
             };
             type = "zfs_fs";

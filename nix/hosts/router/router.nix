@@ -87,12 +87,12 @@
           chain input {
             type filter hook input priority 0; policy drop;
 
-            # iifname { "lan" } accept comment "Allow local network to access the router"
+            iifname { "wan", "lan" } icmp type { echo-request, destination-unreachable, time-exceeded } counter accept comment "Allow select ICMP"
+
             iifname { "lan" } tcp dport @monitoring-ports accept comment "Allow TCP monitoring ports on LAN"
             iifname { "lan" } tcp dport @ssh-ports accept comment "Allow SSH access from LAN"
 
             iifname "wan" ct state { established, related } accept comment "Allow established traffic"
-            iifname "wan" icmp type { echo-request, destination-unreachable, time-exceeded } counter accept comment "Allow select ICMP"
             iifname "wan" counter drop comment "Drop all other unsolicited traffic from wan"
 
             iifname "lo" accept comment "Accept everything from loopback interface"

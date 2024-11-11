@@ -120,12 +120,16 @@ let
       unset SOPS_AGE_KEY_FILE
 
       # TODO: improve this
+      echo "+ starting virtiofsdServices"
       # shellcheck disable=SC2068
       ssh $@ "sudo systemctl start ${virtiofsdServices}"
+      echo "+ creating tmpdir"
       # shellcheck disable=SC2068
       remote_tmp_dir=$(ssh $@ "mktemp -d")
+      echo "+ copying files tmpdir"
       # shellcheck disable=SC2068,SC2145
       scp -r "$microvm_state_dir"/* $@":$remote_tmp_dir/"
+      echo "+ extracting files"
       # shellcheck disable=SC2068,2029
       ssh $@ "sudo sh -c 'cp -a --no-preserve=ownership $remote_tmp_dir/* ${nixosConfig.microvm.stateDir}; rm -rf $remote_tmp_dir'"
     '';

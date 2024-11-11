@@ -123,9 +123,9 @@ in
                 NAME="$1"
                 BASE="${cfg.baseZfsDataset}"
                 zfsExists "$BASE" || \
-                  zfs create "$BASE"
+                  zfs create -o canmount=off "$BASE"
                 zfsExists $BASE/$NAME || \
-                  zfs create "$BASE/$NAME"
+                  zfs create -o canmount=off "$BASE/$NAME"
                 for d in current/share/microvm/virtiofs/*; do
                   SOURCE="$(cat $d/source)"
                   TAG="$(basename $d)"

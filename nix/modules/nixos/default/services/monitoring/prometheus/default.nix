@@ -42,6 +42,7 @@ let
 
         # Depreciated exporters
         "minio"
+        "tor"
       ];
 
       exporters' = filterAttrs (_: v: (v ? enable) && (v ? port)) exporters;

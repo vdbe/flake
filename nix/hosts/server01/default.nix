@@ -40,7 +40,7 @@
     microvm = {
       host = {
         enable = true;
-        baseZfsDataset = "zroot/microvms";
+        baseZfsDataset = "zroot/local/microvms";
         vms = lib.mkMerge [
           {
             inherit (inputs.self.unevaluatedNixosConfigurations)

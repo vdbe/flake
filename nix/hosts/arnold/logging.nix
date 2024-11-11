@@ -1,4 +1,9 @@
-{ config, pkgs-my, ... }:
+{
+  config,
+  pkgs,
+  pkgs-my,
+  ...
+}:
 let
   grafanaServerSettings = config.services.grafana.settings.server;
 
@@ -17,6 +22,7 @@ in
 
   networking = {
     firewall = {
+      interfaces.tailscale0.allowedTCPPorts = [ 80 ];
       interfaces.end0 = {
         allowedTCPPorts = [
           80
@@ -62,7 +68,9 @@ in
 
     grafana = {
       enable = true;
-      declarativePlugins = with pkgs-my.grafanaPlugins; [ grafana-lokiexplore-app ];
+      declarativePlugins =
+        (with pkgs.grafanaPlugins; [ yesoreyeram-infinity-datasource ])
+        ++ (with pkgs-my.grafanaPlugins; [ grafana-lokiexplore-app ]);
       settings = {
         server = {
           protocol = "socket";
@@ -86,11 +94,27 @@ in
         datasources.settings = {
           datasources = [
             {
-              name = "Prometheus";
+              name = "Prometheus 10s";
+              type = "prometheus";
+              url = "http://localhost:${toString config.services.prometheus.port}";
+              jsonData = {
+                timeInterval = "10s";
+              };
+            }
+            {
+              name = "Prometheus 1m";
               type = "prometheus";
               url = "http://localhost:${toString config.services.prometheus.port}";
               jsonData = {
                 timeInterval = "1m";
+              };
+            }
+            {
+              name = "Prometheus 2m";
+              type = "prometheus";
+              url = "http://localhost:${toString config.services.prometheus.port}";
+              jsonData = {
+                timeInterval = "2m";
               };
             }
             {
@@ -104,28 +128,53 @@ in
       };
     };
 
+    prometheus.scrapeConfigs = [
+      {
+        job_name = "ispmonitor";
+        scrape_interval = "10s";
+        static_configs = [
+          { targets = [ "localhost:9273" ]; }
+        ];
+
+      }
+    ];
+
     telegraf = {
       enable = true;
       extraConfig = {
-        inputs = {
-          ping = {
-            urls = [
-              "1.1.1.1"
+        inputs =
+          let
+            dns_servers = config.mymodules.secrets.host.extra.logging.dns_servers;
+            domains = [
               "google.com"
+              "1.1.1.1"
+              "cloudflare.com"
             ];
-            count = 3;
-            deadline = 5;
-            interval = 10;
-          };
+          in
+          {
+            ping = {
+              urls = [
+                "192.168.0.1"
+                "8.8.8.8"
+              ] ++ dns_servers ++ domains;
+              count = 4;
+              interval = 10.0;
+              timeout = 2.0;
+            };
 
-          internet_speed = {
-            interval = "60m";
+            dns_query = {
+              servers = dns_servers;
+              inherit domains;
+            };
+
+            internet_speed = {
+              interval = "60m";
+            };
           };
-        };
         outputs = {
-          loki = {
-            domain = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
-            metric_name_label = "job";
+          prometheus_client = {
+            listen = "http://localhost:9273";
+            metric_version = 2;
           };
         };
       };
